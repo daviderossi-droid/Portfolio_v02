@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rossi Davide — Creative Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080a0f;
+    --surface: #0e1117;
+    --card: #12161f;
+    --border: rgba(255,255,255,0.06);
+    --accent: #00d4ff;
+    --accent2: #f0c040;
+    --text: #e8eaf0;
+    --muted: #6b7280;
+    --glow: 0 0 40px rgba(0,212,255,0.15);
+  }
+
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* CUSTOM CURSOR */
+  .cursor { position:fixed; width:10px; height:10px; background:var(--accent); border-radius:50%; pointer-events:none; z-index:9999; transform:translate(-50%,-50%); transition:transform .1s; mix-blend-mode:difference; }
+  .cursor-ring { position:fixed; width:36px; height:36px; border:1px solid var(--accent); border-radius:50%; pointer-events:none; z-index:9998; transform:translate(-50%,-50%); transition:all .18s ease; opacity:.6; }
+
+  /* NAV */
+  nav {
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:1.4rem 4rem;
+    background: rgba(8,10,15,0.85);
+    backdrop-filter:blur(20px);
+    border-bottom:1px solid var(--border);
+  }
+  .logo {
+    font-family:'Bebas Neue',sans-serif;
+    font-size:1.6rem;
+    letter-spacing:.12em;
+    color:var(--text);
+  }
+  .logo span { color:var(--accent); }
+  .nav-links { display:flex; gap:2.5rem; list-style:none; }
+  .nav-links a {
+    color:var(--muted); font-size:.85rem; letter-spacing:.08em;
+    text-transform:uppercase; text-decoration:none;
+    transition:color .2s;
+  }
+  .nav-links a:hover { color:var(--accent); }
+
+  /* NOISE OVERLAY */
+  body::before {
+    content:''; position:fixed; inset:0; pointer-events:none; z-index:1;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    opacity:.4;
+  }
+
+  /* HERO */
+  #home {
+    min-height:100vh; display:flex; align-items:center; justify-content:center;
+    position:relative; overflow:hidden;
+    padding-top:80px;
+  }
+  .hero-bg {
+    position:absolute; inset:0;
+    background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(0,212,255,0.07) 0%, transparent 70%),
+                radial-gradient(ellipse 50% 50% at 80% 80%, rgba(240,192,64,0.05) 0%, transparent 60%);
+  }
+  .hero-grid {
+    position:absolute; inset:0;
+    background-image: linear-gradient(var(--border) 1px, transparent 1px),
+                      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size:80px 80px;
+    mask-image:radial-gradient(ellipse at center, black 30%, transparent 80%);
+  }
+  .hero-content { position:relative; z-index:2; text-align:center; max-width:780px; padding:0 2rem; }
+  .hero-eyebrow {
+    font-family:'Space Mono',monospace; font-size:.75rem; letter-spacing:.3em;
+    color:var(--accent); text-transform:uppercase; margin-bottom:1.5rem;
+    opacity:0; animation:fadeUp .8s .2s ease forwards;
+  }
+  .hero-name {
+    font-family:'Bebas Neue',sans-serif; font-size:clamp(5rem,12vw,9rem);
+    line-height:.95; letter-spacing:.04em; color:var(--text);
+    opacity:0; animation:fadeUp .8s .35s ease forwards;
+  }
+  .hero-name span { color:var(--accent); }
+  .hero-sub {
+    margin-top:1.2rem; font-size:1.1rem; font-weight:300; color:var(--muted);
+    letter-spacing:.05em;
+    opacity:0; animation:fadeUp .8s .5s ease forwards;
+  }
+  .hero-cta { margin-top:3rem; display:flex; gap:1rem; justify-content:center; opacity:0; animation:fadeUp .8s .65s ease forwards; }
+  .btn {
+    padding:.85rem 2.2rem; font-size:.85rem; letter-spacing:.1em;
+    text-transform:uppercase; text-decoration:none; font-family:'Space Mono',monospace;
+    border-radius:3px; transition:all .25s;
+  }
+  .btn-primary { background:var(--accent); color:#080a0f; }
+  .btn-primary:hover { background:#fff; transform:translateY(-2px); box-shadow:0 10px 30px rgba(0,212,255,.3); }
+  .btn-ghost { border:1px solid rgba(255,255,255,.2); color:var(--text); }
+  .btn-ghost:hover { border-color:var(--accent); color:var(--accent); transform:translateY(-2px); }
+
+  .scroll-indicator {
+    position:absolute; bottom:2.5rem; left:50%; transform:translateX(-50%);
+    display:flex; flex-direction:column; align-items:center; gap:.5rem;
+    opacity:0; animation:fadeIn 1s 1.2s ease forwards;
+  }
+  .scroll-indicator span { font-size:.65rem; letter-spacing:.2em; color:var(--muted); text-transform:uppercase; }
+  .scroll-line { width:1px; height:50px; background:linear-gradient(to bottom, var(--accent), transparent); animation:scrollPulse 2s infinite; }
+
+  /* SECTION COMMON */
+  section { padding:8rem 4rem; position:relative; z-index:2; }
+  .section-label {
+    font-family:'Space Mono',monospace; font-size:.7rem; letter-spacing:.3em;
+    color:var(--accent); text-transform:uppercase; margin-bottom:.8rem;
+  }
+  .section-title {
+    font-family:'Bebas Neue',sans-serif; font-size:clamp(3rem,6vw,5rem);
+    line-height:1; color:var(--text); margin-bottom:1rem;
+  }
+  .section-title span { color:var(--accent); }
+  .section-desc { max-width:540px; font-size:1rem; color:var(--muted); line-height:1.7; }
+
+  /* SKILLS */
+  #skills { background: var(--surface); }
+  .skills-layout { display:grid; grid-template-columns:1fr 1fr; gap:5rem; align-items:center; max-width:1200px; margin:0 auto; }
+  .skills-info .section-desc { max-width:100%; }
+
+  .skill-bars { display:flex; flex-direction:column; gap:2rem; margin-top:2rem; }
+  .skill-item {}
+  .skill-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:.6rem; }
+  .skill-name { font-family:'Space Mono',monospace; font-size:.8rem; letter-spacing:.1em; text-transform:uppercase; color:var(--text); display:flex; align-items:center; gap:.7rem; }
+  .skill-icon { font-size:1.1rem; }
+  .skill-pct { font-family:'Space Mono',monospace; font-size:.75rem; color:var(--accent); }
+  .skill-track { height:3px; background:rgba(255,255,255,.07); border-radius:2px; overflow:hidden; }
+  .skill-fill { height:100%; background:linear-gradient(90deg, var(--accent), var(--accent2)); border-radius:2px; transform:scaleX(0); transform-origin:left; transition:transform 1.2s cubic-bezier(.22,1,.36,1); }
+  .skill-fill.animated { transform:scaleX(1); }
+
+  .skills-visual { position:relative; height:380px; display:flex; align-items:center; justify-content:center; }
+  .orbit-ring {
+    position:absolute; border:1px solid var(--border);
+    border-radius:50%; animation:spin 18s linear infinite;
+  }
+  .orbit-ring:nth-child(1) { width:260px; height:260px; }
+  .orbit-ring:nth-child(2) { width:180px; height:180px; animation-duration:12s; animation-direction:reverse; }
+  .orbit-ring:nth-child(3) { width:340px; height:340px; animation-duration:25s; }
+  .orbit-dot {
+    position:absolute; width:8px; height:8px; background:var(--accent);
+    border-radius:50%; box-shadow:0 0 12px var(--accent);
+    top:-4px; left:50%; transform:translateX(-50%);
+  }
+  .orbit-dot2 { background:var(--accent2); box-shadow:0 0 12px var(--accent2); }
+  .center-icon { font-size:3rem; z-index:2; filter:drop-shadow(0 0 20px rgba(0,212,255,.4)); }
+
+  /* PORTFOLIO */
+  #portfolio { max-width:1400px; margin:0 auto; padding:8rem 4rem; }
+  .portfolio-tabs { display:flex; gap:.5rem; margin:3rem 0 2.5rem; }
+  .tab {
+    padding:.55rem 1.4rem; font-size:.78rem; letter-spacing:.08em;
+    text-transform:uppercase; font-family:'Space Mono',monospace;
+    border:1px solid var(--border); color:var(--muted);
+    background:transparent; cursor:pointer; border-radius:2px; transition:all .2s;
+  }
+  .tab.active, .tab:hover { border-color:var(--accent); color:var(--accent); background:rgba(0,212,255,.06); }
+
+  .portfolio-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; }
+  .portfolio-grid.two-col { grid-template-columns:repeat(2,1fr); }
+
+  .card {
+    position:relative; overflow:hidden; border-radius:4px;
+    background:var(--card); border:1px solid var(--border);
+    group: true; cursor:pointer;
+    transition:transform .3s, box-shadow .3s;
+  }
+  .card:hover { transform:translateY(-6px); box-shadow:0 20px 60px rgba(0,0,0,.5), 0 0 0 1px rgba(0,212,255,.15); }
+  .card-img {
+    width:100%; aspect-ratio:16/10; object-fit:cover;
+    display:block; transition:transform .5s ease;
+    filter:brightness(.85) saturate(1.1);
+  }
+  .card:hover .card-img { transform:scale(1.04); filter:brightness(1) saturate(1.2); }
+  .card-overlay {
+    position:absolute; inset:0;
+    background:linear-gradient(to top, rgba(8,10,15,.95) 0%, transparent 60%);
+    display:flex; flex-direction:column; justify-content:flex-end;
+    padding:1.5rem; opacity:0; transition:opacity .3s;
+  }
+  .card:hover .card-overlay { opacity:1; }
+  .card-always {
+    position:absolute; bottom:0; left:0; right:0;
+    padding:1.2rem 1.5rem;
+    background:linear-gradient(to top, rgba(8,10,15,.9) 0%, transparent 100%);
+  }
+  .card-cat { font-family:'Space Mono',monospace; font-size:.65rem; letter-spacing:.2em; color:var(--accent); text-transform:uppercase; margin-bottom:.3rem; }
+  .card-title { font-size:1rem; font-weight:600; color:var(--text); }
+  .card-desc { font-size:.82rem; color:var(--muted); margin-top:.5rem; line-height:1.5; }
+  .card-tags { display:flex; gap:.5rem; flex-wrap:wrap; margin-top:.8rem; }
+  .tag { padding:.25rem .7rem; font-size:.65rem; font-family:'Space Mono',monospace; letter-spacing:.08em; border:1px solid rgba(0,212,255,.25); color:var(--accent); border-radius:2px; }
+
+  /* VIDEO SECTION */
+  #video { background:var(--surface); padding:8rem 4rem; }
+  .video-inner { max-width:1000px; margin:0 auto; }
+  .video-wrap {
+    margin-top:3rem; position:relative; border-radius:6px; overflow:hidden;
+    border:1px solid var(--border); box-shadow:0 40px 100px rgba(0,0,0,.6);
+  }
+  .video-wrap video { width:100%; display:block; }
+  .video-glow { position:absolute; inset:-40px; background:radial-gradient(ellipse at center, rgba(0,212,255,.08), transparent 70%); pointer-events:none; }
+
+  /* 3D VIDEO SECTION */
+  #video3d { padding:8rem 4rem; max-width:1200px; margin:0 auto; }
+  .video3d-grid { display:grid; grid-template-columns:1fr 1fr; gap:2rem; margin-top:3rem; }
+  .video3d-card {
+    border-radius:4px; overflow:hidden; background:var(--card);
+    border:1px solid var(--border); aspect-ratio:16/9;
+    display:flex; align-items:center; justify-content:center; position:relative;
+  }
+  .video-placeholder {
+    width:100%; height:100%; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:1rem;
+    background:linear-gradient(135deg, var(--card), #1a1f2e);
+  }
+  .play-btn {
+    width:64px; height:64px; border-radius:50%;
+    border:2px solid var(--accent); display:flex; align-items:center; justify-content:center;
+    font-size:1.4rem; color:var(--accent); transition:all .3s;
+    box-shadow:0 0 20px rgba(0,212,255,.2);
+  }
+  .video3d-card:hover .play-btn { background:var(--accent); color:#080a0f; box-shadow:0 0 40px rgba(0,212,255,.4); }
+  .video-label { font-family:'Space Mono',monospace; font-size:.75rem; letter-spacing:.1em; color:var(--muted); }
+
+  /* CONTACTS */
+  #contacts { background:var(--surface); padding:8rem 4rem; text-align:center; }
+  .contacts-inner { max-width:700px; margin:0 auto; }
+  .contact-line {
+    width:80px; height:1px; background:var(--accent); margin:2rem auto;
+    box-shadow:0 0 10px var(--accent);
+  }
+  .contact-desc { color:var(--muted); font-size:1rem; line-height:1.7; margin-bottom:3rem; }
+  .contact-email {
+    font-family:'Bebas Neue',sans-serif; font-size:clamp(2rem,5vw,3.5rem);
+    letter-spacing:.08em; color:var(--text); text-decoration:none;
+    display:inline-block; transition:color .2s;
+  }
+  .contact-email:hover { color:var(--accent); }
+
+  .social-links { display:flex; gap:1.5rem; justify-content:center; margin-top:3rem; flex-wrap:wrap; }
+  .social-link {
+    display:flex; align-items:center; gap:.7rem;
+    padding:.85rem 2rem; border:1px solid var(--border);
+    color:var(--muted); text-decoration:none; border-radius:3px;
+    font-family:'Space Mono',monospace; font-size:.78rem; letter-spacing:.08em;
+    text-transform:uppercase; transition:all .25s;
+  }
+  .social-link:hover { border-color:var(--accent); color:var(--accent); background:rgba(0,212,255,.06); transform:translateY(-3px); }
+  .social-icon { font-size:1.1rem; }
+
+  /* FOOTER */
+  footer {
+    padding:2rem 4rem; border-top:1px solid var(--border);
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:'Space Mono',monospace; font-size:.7rem; color:var(--muted);
+    position:relative; z-index:2;
+  }
+
+  /* SECTION WRAPPERS */
+  .section-content-inner { max-width:1200px; margin:0 auto; }
+
+  /* DIVIDER */
+  .section-divider { display:flex; align-items:center; gap:1rem; margin-bottom:3rem; }
+  .divider-line { flex:1; height:1px; background:var(--border); }
+  .divider-dot { width:6px; height:6px; background:var(--accent); border-radius:50%; box-shadow:0 0 8px var(--accent); }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+  @keyframes spin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
+  @keyframes scrollPulse { 0%,100%{opacity:.4;transform:scaleY(1)} 50%{opacity:1;transform:scaleY(.5)} }
+
+  .reveal { opacity:0; transform:translateY(30px); transition:all .8s cubic-bezier(.22,1,.36,1); }
+  .reveal.visible { opacity:1; transform:translateY(0); }
+
+  /* ACTIVE NAV */
+  .portfolio-section { display:none; }
+  .portfolio-section.active { display:grid; }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">RD<span>.</span></div>
+  <ul class="nav-links">
+    <li><a href="#home">Home</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#portfolio">Portfolio</a></li>
+    <li><a href="#video">Video</a></li>
+    <li><a href="#contacts">Contatti</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="home">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">Creative Director & Visual Artist</p>
+    <h1 class="hero-name">ROSSI<br><span>DAVIDE</span></h1>
+    <p class="hero-sub">AI Art · Photography · Motion · 3D Rendering</p>
+    <div class="hero-cta">
+      <a href="#portfolio" class="btn btn-primary">Vedi il Portfolio</a>
+      <a href="#contacts" class="btn btn-ghost">Contattami</a>
+    </div>
+  </div>
+  <div class="scroll-indicator">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="skills-layout">
+    <div class="skills-info">
+      <p class="section-label reveal">Competenze</p>
+      <h2 class="section-title reveal">My <span>Skills</span></h2>
+      <p class="section-desc reveal">Creo contenuti visivi di alto impatto fondendo intelligenza artificiale, fotografia, animazione 2D/3D e post-produzione. Ogni progetto è una storia che prende vita attraverso immagini potenti.</p>
+
+      <div class="skill-bars">
+        <div class="skill-item reveal">
+          <div class="skill-header">
+            <span class="skill-name"><span class="skill-icon">🤖</span> Artificial Intelligence</span>
+            <span class="skill-pct">95%</span>
+          </div>
+          <div class="skill-track"><div class="skill-fill" style="width:95%"></div></div>
+        </div>
+        <div class="skill-item reveal">
+          <div class="skill-header">
+            <span class="skill-name"><span class="skill-icon">📷</span> Photography</span>
+            <span class="skill-pct">90%</span>
+          </div>
+          <div class="skill-track"><div class="skill-fill" style="width:90%"></div></div>
+        </div>
+        <div class="skill-item reveal">
+          <div class="skill-header">
+            <span class="skill-name"><span class="skill-icon">🎬</span> DaVinci Resolve</span>
+            <span class="skill-pct">85%</span>
+          </div>
+          <div class="skill-track"><div class="skill-fill" style="width:85%"></div></div>
+        </div>
+        <div class="skill-item reveal">
+          <div class="skill-header">
+            <span class="skill-name"><span class="skill-icon">✨</span> After Effects</span>
+            <span class="skill-pct">88%</span>
+          </div>
+          <div class="skill-track"><div class="skill-fill" style="width:88%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="skills-visual">
+      <div class="orbit-ring"><div class="orbit-dot"></div></div>
+      <div class="orbit-ring"><div class="orbit-dot orbit-dot2"></div></div>
+      <div class="orbit-ring"><div class="orbit-dot"></div></div>
+      <div class="center-icon">⚡</div>
+    </div>
+  </div>
+</section>
+
+<!-- PORTFOLIO -->
+<div id="portfolio" style="padding:8rem 4rem;">
+  <div class="section-content-inner">
+    <p class="section-label reveal">Lavori</p>
+    <h2 class="section-title reveal">My <span>Portfolio</span></h2>
+    <p class="section-desc reveal">Una selezione dei miei progetti recenti tra grafica social, rendering architetturali e produzioni video.</p>
+
+    <div class="portfolio-tabs">
+      <button class="tab active" onclick="showTab('social')">Grafiche Social</button>
+      <button class="tab" onclick="showTab('rendering')">Rendering 3D</button>
+    </div>
+
+    <!-- SOCIAL -->
+    <div class="portfolio-section active" id="tab-social" style="display:grid; grid-template-columns:repeat(2,1fr); gap:1.5rem;">
+      <div class="card reveal">
+        <img src="assets/social_c2c.png" class="card-img" alt="C2C Festival">
+        <div class="card-always">
+          <div class="card-cat">Grafica Social</div>
+          <div class="card-title">C2C Festival — Poster Design</div>
+        </div>
+        <div class="card-overlay">
+          <div class="card-desc">Poster ufficiale Europa C2C Festival 2025 — Torino. Identità visiva bold in giallo e nero.</div>
+          <div class="card-tags"><span class="tag">Graphic Design</span><span class="tag">AI</span><span class="tag">Motion</span></div>
+        </div>
+      </div>
+      <div class="card reveal">
+        <img src="assets/social_strangerthings.png" class="card-img" alt="Stranger Things">
+        <div class="card-always">
+          <div class="card-cat">Grafica Social</div>
+          <div class="card-title">Stranger Things — 10th Anniversary</div>
+        </div>
+        <div class="card-overlay">
+          <div class="card-desc">Cofanetto commemorativo del 10° anniversario. Compositing AI e post-produzione avanzata.</div>
+          <div class="card-tags"><span class="tag">AI Art</span><span class="tag">Compositing</span><span class="tag">After Effects</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RENDERING -->
+    <div class="portfolio-section" id="tab-rendering" style="grid-template-columns:repeat(2,1fr); gap:1.5rem;">
+      <div class="card reveal">
+        <img src="assets/rendering_book.png" class="card-img" alt="Ancient Book">
+        <div class="card-always">
+          <div class="card-cat">Rendering 3D</div>
+          <div class="card-title">Ancient Grimoire — Atmospheric Scene</div>
+        </div>
+        <div class="card-overlay">
+          <div class="card-desc">Rendering fotorealistico di un libro antico illuminato da lanterna. Ambiente dark e cinematografico.</div>
+          <div class="card-tags"><span class="tag">3D Render</span><span class="tag">Lighting</span><span class="tag">DaVinci</span></div>
+        </div>
+      </div>
+      <div class="card reveal">
+        <img src="assets/rendering_bar.png" class="card-img" alt="Bar Interior">
+        <div class="card-always">
+          <div class="card-cat">Rendering 3D</div>
+          <div class="card-title">Luxury Bar Interior — Archviz</div>
+        </div>
+        <div class="card-overlay">
+          <div class="card-desc">Visualizzazione architettonica di un bar di lusso. Stile industriale con accenti oro e marmo.</div>
+          <div class="card-tags"><span class="tag">ArchViz</span><span class="tag">3D Render</span><span class="tag">Lighting</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- VIDEO 2D -->
+<section id="video">
+  <div class="video-inner">
+    <p class="section-label reveal">Showreel</p>
+    <h2 class="section-title reveal">Video <span>2D</span></h2>
+    <p class="section-desc reveal">Motion graphics, montaggio creativo e storytelling visivo. Dal concept alla consegna finale.</p>
+
+    <div class="video-wrap reveal">
+      <div class="video-glow"></div>
+      <video controls poster="">
+        <source src="assets/showreel.mp4" type="video/mp4">
+        Il tuo browser non supporta il tag video.
+      </video>
+    </div>
+  </div>
+</section>
+
+<!-- VIDEO 3D -->
+<section id="video3d">
+  <div class="section-content-inner">
+    <p class="section-label reveal">Animazioni</p>
+    <h2 class="section-title reveal">Video <span>3D</span></h2>
+    <p class="section-desc reveal">Animazioni tridimensionali, walkthrough architetturali e motion design volumetrico.</p>
+
+    <div class="video3d-grid">
+      <div class="video3d-card reveal">
+        <div class="video-placeholder">
+          <div class="play-btn">▶</div>
+          <span class="video-label">Archviz Walkthrough</span>
+        </div>
+      </div>
+      <div class="video3d-card reveal">
+        <div class="video-placeholder">
+          <div class="play-btn">▶</div>
+          <span class="video-label">Product Animation</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACTS -->
+<section id="contacts">
+  <div class="contacts-inner">
+    <p class="section-label reveal">Get in Touch</p>
+    <h2 class="section-title reveal">Lavoriamo<br><span>Insieme</span></h2>
+    <div class="contact-line"></div>
+    <p class="contact-desc reveal">Hai un progetto in mente? Sono sempre aperto a nuove collaborazioni creative. Parliamone.</p>
+
+    <a href="mailto:davide.rossi@email.com" class="contact-email reveal">davide.rossi@email.com</a>
+
+    <div class="social-links">
+      <a href="#" class="social-link reveal">
+        <span class="social-icon">📸</span>
+        Instagram
+      </a>
+      <a href="#" class="social-link reveal">
+        <span class="social-icon">💼</span>
+        LinkedIn
+      </a>
+      <a href="#" class="social-link reveal">
+        <span class="social-icon">🎵</span>
+        TikTok
+      </a>
+      <a href="mailto:davide.rossi@email.com" class="social-link reveal">
+        <span class="social-icon">✉️</span>
+        Email
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span>© 2025 Rossi Davide</span>
+  <span style="color:var(--accent); font-size:.65rem; letter-spacing:.2em;">CREATIVE PORTFOLIO</span>
+  <span>Crafted with precision</span>
+</footer>
+
+<script>
+  // Cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top = e.clientY + 'px';
+    setTimeout(() => {
+      ring.style.left = e.clientX + 'px';
+      ring.style.top = e.clientY + 'px';
+    }, 60);
+  });
+  document.querySelectorAll('a,button,.card').forEach(el => {
+    el.addEventListener('mouseenter', () => { cursor.style.transform = 'translate(-50%,-50%) scale(2)'; ring.style.transform = 'translate(-50%,-50%) scale(1.5)'; });
+    el.addEventListener('mouseleave', () => { cursor.style.transform = 'translate(-50%,-50%) scale(1)'; ring.style.transform = 'translate(-50%,-50%) scale(1)'; });
+  });
+
+  // Reveal on scroll
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('visible'); } });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Skill bars
+  const skillObserver = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if(e.isIntersecting) {
+        e.target.querySelectorAll('.skill-fill').forEach(f => f.classList.add('animated'));
+      }
+    });
+  }, { threshold: 0.3 });
+  document.querySelectorAll('#skills').forEach(s => skillObserver.observe(s));
+
+  // Portfolio tabs
+  function showTab(name) {
+    document.querySelectorAll('.portfolio-section').forEach(s => { s.style.display = 'none'; s.classList.remove('active'); });
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    const section = document.getElementById('tab-' + name);
+    if (section) { section.style.display = 'grid'; section.classList.add('active'); }
+    event.target.classList.add('active');
+  }
+</script>
+</body>
+</html>
